@@ -1,4 +1,6 @@
-﻿namespace WindowsGSM.Functions
+﻿using System;
+
+namespace WindowsGSM.Functions
 {
     class ServerTable
     {
@@ -13,5 +15,7 @@
         public string Defaultmap { get; set; }
         public string Maxplayers { get; set; }
         public string RamUsage { get; set; }
+        public DateTime StartedTime { get; set; }
+        public string UpTime { get; set; }
     }
 }
