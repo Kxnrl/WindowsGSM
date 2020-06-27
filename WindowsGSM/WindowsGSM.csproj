@@ -395,6 +395,7 @@
     <Compile Include="Tools\InstallAddons.cs" />
     <Compile Include="Functions\UdpClientHandler.cs" />
     <Compile Include="Tools\Win32AppExceptions.cs" />
+    <Compile Include="Tools\JavaHelper.cs" />
     <Compile Include="WindowsFirewall.cs" />
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
