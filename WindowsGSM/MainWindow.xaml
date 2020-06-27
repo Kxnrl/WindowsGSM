@@ -706,12 +706,12 @@
                         </DataGridTemplateColumn>
                         <DataGridTextColumn Header="Status" IsReadOnly="True" Binding="{Binding Path=Status}" Width="80" MinWidth="80" MaxWidth="80"/>
                         <DataGridTextColumn Header="Server Name" IsReadOnly="True" Binding="{Binding Path=Name}" Width="10*" MinWidth="105"/>
-                        <DataGridTextColumn Header="IP Address" IsReadOnly="True" Binding="{Binding Path=IP}" Width="4*" MinWidth="88"/>
-                        <DataGridTextColumn Header="Port" IsReadOnly="True" Binding="{Binding Path=Port}" Width="4*" MinWidth="52"/>
-                        <DataGridTextColumn Header="Query Port" IsReadOnly="True" Binding="{Binding Path=QueryPort}" Width="4*" MinWidth="93"/>
-                        <DataGridTextColumn Header="Map" IsReadOnly="True" Binding="{Binding Path=Defaultmap}" Width="7*" MinWidth="50"/>
+                        <DataGridTextColumn Header="IP Address" IsReadOnly="True" Binding="{Binding Path=IP}" Width="4*" MinWidth="60"/>
+                        <DataGridTextColumn Header="Port" IsReadOnly="True" Binding="{Binding Path=Port}" Width="3*" MinWidth="40"/>
+                        <!--<DataGridTextColumn Header="Query Port" IsReadOnly="True" Binding="{Binding Path=QueryPort}" Width="4*" MinWidth="93"/>-->
+                        <DataGridTextColumn Header="Map" IsReadOnly="True" Binding="{Binding Path=Defaultmap}" Width="7*" MinWidth="80"/>
                         <DataGridTextColumn Header="Players" IsReadOnly="True" Binding="{Binding Path=Maxplayers}" Width="3*" MinWidth="70"/>
-                        <DataGridTextColumn Header="Uptime" IsReadOnly="True" Binding="{Binding Path=Uptime}" Width="4*" MinWidth="80"/>
+                        <DataGridTextColumn Header="UpTime" IsReadOnly="True" Binding="{Binding Path=UpTime}" Width="4*" MinWidth="93"/>
                         <!--<DataGridTextColumn Header="RAM Usage" IsReadOnly="True" Binding="{Binding Path=RamUsage}" Width="4*"/>-->
                     </DataGrid.Columns>
                 </DataGrid>

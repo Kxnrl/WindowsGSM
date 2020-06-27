@@ -341,6 +341,7 @@ namespace WindowsGSM
                         StartRestartCrontabCheck(server);
                         StartSendHeartBeat(server);
                         StartQuery(server);
+                        StartExceptionDetecter(server);
                     }
                 }
             }
@@ -648,9 +649,14 @@ namespace WindowsGSM
         public void LoadServerTable()
         {
             string[] livePlayerData = new string[MAX_SERVER + 1];
+            var liveMapData = new string[MAX_SERVER + 1];
+            var liveUptimeData = new string[MAX_SERVER + 1]; 
             foreach (ServerTable item in ServerGrid.Items)
             {
-                livePlayerData[int.Parse(item.ID)] = item.Maxplayers;
+                var id = int.Parse(item.ID);
+                livePlayerData[id] = item.Maxplayers;
+                liveMapData[id] = item.Defaultmap;
+                liveUptimeData[id] = item.UpTime;
             }
 
             var selectedrow = (ServerTable)ServerGrid.SelectedItem;
@@ -730,8 +736,10 @@ namespace WindowsGSM
                         IP = serverConfig.ServerIP,
                         Port = serverConfig.ServerPort,
                         QueryPort = serverConfig.ServerQueryPort,
-                        Defaultmap = serverConfig.ServerMap,
+                        Defaultmap = (g_iServerStatus[i] != ServerStatus.Started) ? serverConfig.ServerMap : liveMapData[i],
                         Maxplayers = (GetServerMetadata(i).ServerStatus != ServerStatus.Started) ? serverConfig.ServerMaxPlayer : livePlayerData[i]
+                        //Maxplayers = (g_iServerStatus[i] != ServerStatus.Started) ? serverConfig.ServerMaxPlayer : livePlayerData[i],
+                        //UpTime = (g_iServerStatus[i] != ServerStatus.Started) ? "N/A" : liveUptimeData[i]
                     };
 
                     SaveServerConfigToServerMetadata(i, serverConfig);
@@ -1892,6 +1900,8 @@ namespace WindowsGSM
             ServerCache.SaveProcessName(server.ID, p.ProcessName);
             ServerCache.SaveWindowsIntPtr(server.ID, GetServerMetadata(server.ID).MainWindow);
 
+            server.StartedTime = DateTime.Now;
+
             SetWindowText(p.MainWindowHandle, server.Name);
 
             ShowWindow(p.MainWindowHandle, WindowShowStyle.Hide);
@@ -1903,6 +1913,8 @@ namespace WindowsGSM
             StartSendHeartBeat(server);
 
             StartQuery(server);
+
+            StartExceptionDetecter(server);
 
             if (MahAppSwitch_SendStatistics.IsOn)
             {
@@ -2460,7 +2472,7 @@ namespace WindowsGSM
                         break;
                     }
 
-                    Log(server.ID, $"Checking: Version ({localVersion}) => ({remoteVersion})");
+                    Log(server.ID, $"Checking: Version ({localVersion}) => ({remoteVersion})", false);
 
                     if (localVersion != remoteVersion)
                     {
@@ -2616,7 +2628,69 @@ namespace WindowsGSM
             }
         }
 
-        private async void StartQuery(ServerTable server)
+        private async void StartExceptionDetecter(Functions.ServerTable server)
+        {
+            // Check is source engine game?
+            var type = GameServer.Data.Class.GetType(server.Game);
+            if (!type.IsSubclassOf(typeof(GameServer.Engine.Source)))
+            {
+                return;
+            }
+
+            //Log(server.ID, "StartExceptionDetector");
+
+            // Save the process of game server
+            var p = g_Process[int.Parse(server.ID)];
+
+            // Check server status every 1 seconds
+            while (p != null && !p.HasExited)
+            {
+                await Task.Delay(1000);
+
+                server.UpTime = "N/A";
+
+                if (g_iServerStatus[int.Parse(server.ID)] == ServerStatus.Stopped)
+                {
+                    break;
+                }
+
+                server.UpTime = ((DateTime.Now - server.StartedTime).TotalSeconds < 0) ? 
+                    DateTime.Now + " => " + server.StartedTime : 
+                    (DateTime.Now - server.StartedTime).ToString("d':'hh':'mm':'ss");
+
+                for (int i = 0; i < ServerGrid.Items.Count; i++)
+                {
+                    if (server.ID == ((Functions.ServerTable)ServerGrid.Items[i]).ID)
+                    {
+                        int selectedIndex = ServerGrid.SelectedIndex;
+                        ServerGrid.Items[i] = server;
+                        ServerGrid.SelectedIndex = selectedIndex;
+                        ServerGrid.Items.Refresh();
+                        break;
+                    }
+                }
+
+                var err = "Engine Error";
+                var ret = string.Empty;
+
+                ret = Win32AppExceptions.FindError(p, err);
+                if (string.IsNullOrEmpty(ret))
+                {
+                    err = "Host_Error";
+                }
+                ret = Win32AppExceptions.FindError(p, err);
+                if (string.IsNullOrEmpty(ret))
+                {
+                    continue;
+                }
+
+                Log(server.ID, err + ": " + ret);
+                p.Kill();
+                break;
+            }
+        }
+
+        private async void StartQuery(Functions.ServerTable server)
         {
             if (string.IsNullOrWhiteSpace(server.IP) || string.IsNullOrWhiteSpace(server.QueryPort)) { return; }
 
@@ -2643,16 +2717,32 @@ namespace WindowsGSM
 
                 dynamic query = gameServer.QueryMethod;
                 query.SetAddressPort(server.IP, int.Parse(server.QueryPort));
-                string players = await query.GetPlayersAndMaxPlayers();
-
-                if (players != null)
+                var info = await query.GetPlayersAndMap();
+                if (info != null)
                 {
-                    server.Maxplayers = players;
+                    if (info.Players is string)
+                    {
+                        server.Maxplayers = info.Players as string;
 
-                    for (int i = 0; i < ServerGrid.Items.Count; i++)
+                        for (int i = 0; i < ServerGrid.Items.Count; i++)
+                        {
+                            if (server.ID == ((Functions.ServerTable)ServerGrid.Items[i]).ID)
+                            {
+                                int selectedIndex = ServerGrid.SelectedIndex;
+                                ServerGrid.Items[i] = server;
+                                ServerGrid.SelectedIndex = selectedIndex;
+                                ServerGrid.Items.Refresh();
+                                break;
+                            }
+                        }
+                    }
+
+                    if (info.Map is string)
                     {
                         if (server.ID == ((ServerTable)ServerGrid.Items[i]).ID)
                         {
+                            server.Defaultmap = info.Map as string;
+
                             int selectedIndex = ServerGrid.SelectedIndex;
                             ServerGrid.Items[i] = server;
                             ServerGrid.SelectedIndex = selectedIndex;
@@ -2733,7 +2823,7 @@ namespace WindowsGSM
             DataGrid_RefreshElements();
         }
 
-        public void Log(string serverId, string logText)
+        public void Log(string serverId, string logText, bool append = true)
         {
             string title = int.TryParse(serverId, out int i) ? $"#{i.ToString()}" : serverId;
             string log = $"[{DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss")}][{title}] {logText}" + Environment.NewLine;
@@ -2742,6 +2832,9 @@ namespace WindowsGSM
 
             string logFile = Path.Combine(logPath, $"L{DateTime.Now.ToString("yyyyMMdd")}.log");
             File.AppendAllText(logFile, log);
+
+            if (!append)
+                return;
 
             textBox_wgsmlog.AppendText(log);
             textBox_wgsmlog.Text = RemovedOldLog(textBox_wgsmlog.Text);

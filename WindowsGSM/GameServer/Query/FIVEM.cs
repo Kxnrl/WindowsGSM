@@ -79,5 +79,22 @@ namespace WindowsGSM.GameServer.Query
                 return null;
             }
         }
+
+        public async Task<object> GetPlayersAndMap()
+        {
+            try
+            {
+                var kv = await GetInfo();
+                return new
+                {
+                    Players = kv["clients"] + '/' + kv["sv_maxclients"],
+                    Map = ""
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
     }
 }

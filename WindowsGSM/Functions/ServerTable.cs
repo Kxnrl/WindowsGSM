@@ -27,6 +27,7 @@ namespace WindowsGSM.Functions
                         var time = DateTime.Now - Process.GetProcessById(pid).StartTime;
                         int numberOfDay = (int)time.TotalDays;
                         return $"{numberOfDay} Day{(numberOfDay > 1 ? "s" : string.Empty)}, {time.Hours:D2}:{time.Minutes:D2}";
+                        #error change this table
                     }
                 }
                 catch { }

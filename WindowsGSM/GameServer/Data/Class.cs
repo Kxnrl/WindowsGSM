@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using WindowsGSM.Functions;
 
 namespace WindowsGSM.GameServer.Data
@@ -68,6 +68,59 @@ namespace WindowsGSM.GameServer.Data
 
                     return null;
                 };
+            }
+        }
+
+        public static Type GetType(string serverGame)
+        {
+            switch (serverGame)
+            {
+                case CSGO.FullName: return typeof(CSGO);
+                case GMOD.FullName: return typeof(GMOD);
+                case TF2.FullName: return typeof(TF2);
+                case MCPE.FullName: return typeof(MCPE);
+                case RUST.FullName: return typeof(RUST);
+                case CS.FullName: return typeof(CS);
+                case CSCZ.FullName: return typeof(CSCZ);
+                case HL2DM.FullName: return typeof(HL2DM);
+                case L4D2.FullName: return typeof(L4D2);
+                case MC.FullName: return typeof(MC);
+                case GTA5.FullName: return typeof(GTA5);
+                case SDTD.FullName: return typeof(SDTD);
+                case MORDHAU.FullName: return typeof(MORDHAU);
+                case SE.FullName: return typeof(SE);
+                case DAYZ.FullName: return typeof(DAYZ);
+                case MCBE.FullName: return typeof(MCBE);
+                case OLOW.FullName: return typeof(OLOW);
+                case CSS.FullName: return typeof(CSS);
+                case INS.FullName: return typeof(INS);
+                case NMRIH.FullName: return typeof(NMRIH);
+                case ARKSE.FullName: return typeof(ARKSE);
+                case ZPS.FullName: return typeof(ZPS);
+                case DODS.FullName: return typeof(DODS);
+                case SW.FullName: return typeof(SW);
+                case ROK.FullName: return typeof(ROK);
+                case HEAT.FullName: return typeof(HEAT);
+                case BW.FullName: return typeof(BW);
+                case ONSET.FullName: return typeof(ONSET);
+                case EGS.FullName: return typeof(EGS);
+                case UNT.FullName: return typeof(UNT);
+                case AVORION.FullName: return typeof(AVORION);
+                case CE.FullName: return typeof(CE);
+                case INSS.FullName: return typeof(INSS);
+                case DOD.FullName: return typeof(DOD);
+                case DMC.FullName: return typeof(DMC);
+                case HLOF.FullName: return typeof(HLOF);
+                case RCC.FullName: return typeof(RCC);
+                case TFC.FullName: return typeof(TFC);
+                case TF.FullName: return typeof(TF);
+                case SQ.FullName: return typeof(SQ);
+                case BT.FullName: return typeof(BT);
+                case PS.FullName: return typeof(PS);
+                case ROR2.FullName: return typeof(ROR2);
+                case ECO.FullName: return typeof(ECO);
+                case VTS.FullName: return typeof(VTS);
+                default: return null;
             }
         }
     }
