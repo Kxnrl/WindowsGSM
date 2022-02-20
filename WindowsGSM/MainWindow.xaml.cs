@@ -342,6 +342,8 @@ namespace WindowsGSM
                         StartSendHeartBeat(server);
                         StartQuery(server);
                         StartExceptionDetecter(server);
+
+                        SetServerStatus(server, "Started");
                     }
                 }
             }
@@ -364,6 +366,8 @@ namespace WindowsGSM
             StartServerTableRefresh();
 
             StartDashBoardRefresh();
+
+            StartMainChartRefresh();
         }
 
         private Process GetConsoleProcess(int processId)
@@ -849,6 +853,22 @@ namespace WindowsGSM
             }
         }
 
+        private async void StartMainChartRefresh()
+        {
+            await Task.Delay(6000);
+
+            while (true)
+            {
+                Debug.Print("MainChartRefresh");
+
+                var selectedIndex = ServerGrid.SelectedIndex;
+                ServerGrid.Items.Refresh();
+                ServerGrid.SelectedIndex = selectedIndex;
+
+                await Task.Delay(1000);
+            }
+        }
+
         private async void StartDashBoardRefresh()
         {
             var system = new SystemMetrics();
@@ -897,7 +917,7 @@ namespace WindowsGSM
 
                 Refresh_DashBoard_LiveChart();
 
-                await Task.Delay(2000);
+                await Task.Delay(1000);
             }
         }
 
@@ -1602,6 +1622,7 @@ namespace WindowsGSM
                 if (GetServerMetadata(server.ID).ServerStatus == ServerStatus.Stopped)
                 {
                     await GameServer_Start(server);
+                    await Task.Delay(TimeSpan.FromSeconds(10));
                 }
             }
         }
@@ -1894,6 +1915,8 @@ namespace WindowsGSM
             {
                 Log(server.ID, $"[NOTICE] Fail to set affinity. ({e.Message})");
             }
+
+            server.StartedTime = DateTime.Now;
 
             // Save Cache
             ServerCache.SavePID(server.ID, p.Id);
@@ -2637,6 +2660,9 @@ namespace WindowsGSM
                 return;
             }
 
+            server.CrashReason = "Exited";
+            server.CrashMessage = "Crashed by closing";
+
             //Log(server.ID, "StartExceptionDetector");
 
             // Save the process of game server
@@ -2658,18 +2684,6 @@ namespace WindowsGSM
                     DateTime.Now + " => " + server.StartedTime : 
                     (DateTime.Now - server.StartedTime).ToString("d':'hh':'mm':'ss");
 
-                for (int i = 0; i < ServerGrid.Items.Count; i++)
-                {
-                    if (server.ID == ((Functions.ServerTable)ServerGrid.Items[i]).ID)
-                    {
-                        int selectedIndex = ServerGrid.SelectedIndex;
-                        ServerGrid.Items[i] = server;
-                        ServerGrid.SelectedIndex = selectedIndex;
-                        ServerGrid.Items.Refresh();
-                        break;
-                    }
-                }
-
                 var err = "Engine Error";
                 var ret = string.Empty;
 
@@ -2684,6 +2698,8 @@ namespace WindowsGSM
                     continue;
                 }
 
+                server.CrashReason = err;
+                server.CrashMessage = ret;
                 Log(server.ID, err + ": " + ret);
                 p.Kill();
                 break;
@@ -2720,24 +2736,27 @@ namespace WindowsGSM
                 var info = await query.GetPlayersAndMap();
                 if (info != null)
                 {
+                    var changed = false;
+
                     if (info.Players is string)
                     {
+                        changed = true;
                         server.Maxplayers = info.Players as string;
+                    }
 
-                        for (int i = 0; i < ServerGrid.Items.Count; i++)
+                    if (info.Map is string && !string.IsNullOrEmpty(info.Map))
+                    {
+                        changed = true;
+                        server.Defaultmap = (string)info.Map;
+
+                        if (!server.Defaultmap.Equals(Functions.ServerConfig.GetSetting(server.ID, Functions.ServerConfig.SettingName.ServerMap)))
                         {
-                            if (server.ID == ((Functions.ServerTable)ServerGrid.Items[i]).ID)
-                            {
-                                int selectedIndex = ServerGrid.SelectedIndex;
-                                ServerGrid.Items[i] = server;
-                                ServerGrid.SelectedIndex = selectedIndex;
-                                ServerGrid.Items.Refresh();
-                                break;
-                            }
+                            // save to nextmap
+                            Functions.ServerConfig.SetSetting(server.ID, Functions.ServerConfig.SettingName.ServerMap, server.Defaultmap.Trim());
                         }
                     }
 
-                    if (info.Map is string)
+                    if (changed)
                     {
                         if (server.ID == ((ServerTable)ServerGrid.Items[i]).ID)
                         {

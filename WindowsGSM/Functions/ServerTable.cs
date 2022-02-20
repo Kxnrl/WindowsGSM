@@ -35,5 +35,7 @@ namespace WindowsGSM.Functions
                 return string.Empty;
             }
         }
+        public string CrashMessage { get; set; }
+        public string CrashReason { get; set; }
     }
 }

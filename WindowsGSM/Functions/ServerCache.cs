@@ -43,11 +43,38 @@ namespace WindowsGSM.Functions
             File.WriteAllText(GetProcessNamePath(serverId), pName);
         }
 
+        public static DateTime GetUptime(string serverId)
+        {
+            var cacheFile = GetUptimePath(serverId);
+            if (!File.Exists(cacheFile))
+            {
+                return DateTime.Now;
+            }
+            var text = File.ReadAllText(cacheFile);
+            if (!string.IsNullOrEmpty(text) && DateTime.TryParse(text.Trim(), out var time))
+            {
+                return time;
+            }
+            return DateTime.Now;
+        }
+
+        public static void SaveUptime(string serverId, DateTime time)
+        {
+            File.WriteAllText(GetUptimePath(serverId), time.ToString());
+        }
+
         private static string GetProcessNamePath(string serverId)
         {
             string cachePath = ServerPath.GetServersCache(serverId);
             Directory.CreateDirectory(cachePath);
             return Path.Combine(cachePath, "processName");
+        }
+
+        private static string GetUptimePath(string serverId)
+        {
+            var cachePath = ServerPath.GetServersCache(serverId);
+            Directory.CreateDirectory(cachePath);
+            return Path.Combine(cachePath, "Uptime");
         }
 
         public static IntPtr GetWindowsIntPtr(string serverId)
