@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
-namespace WindowsGSM.Tools
+namespace WindowsGSM.Functions
 {
     static class Win32AppExceptions
     {

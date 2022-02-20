@@ -696,7 +696,6 @@
                           HorizontalScrollBarVisibility="Disabled">
                     <DataGrid.Columns>
                         <DataGridTextColumn Header="ID" IsReadOnly="True" Binding="{Binding Path=ID}" Width="35" MinWidth="35" MaxWidth="35"/>
-                        <DataGridTextColumn Header="PID" IsReadOnly="True" Binding="{Binding Path=PID}" Width="65" MinWidth="55" MaxWidth="95"/>
                         <DataGridTemplateColumn Header="MOD" IsReadOnly="True" Width="53" MinWidth="53" MaxWidth="53">
                             <DataGridTemplateColumn.CellTemplate>
                                 <DataTemplate>
@@ -704,14 +703,555 @@
                                 </DataTemplate>
                             </DataGridTemplateColumn.CellTemplate>
                         </DataGridTemplateColumn>
-                        <DataGridTextColumn Header="Status" IsReadOnly="True" Binding="{Binding Path=Status}" Width="80" MinWidth="80" MaxWidth="80"/>
-                        <DataGridTextColumn Header="Server Name" IsReadOnly="True" Binding="{Binding Path=Name}" Width="10*" MinWidth="105"/>
-                        <DataGridTextColumn Header="IP Address" IsReadOnly="True" Binding="{Binding Path=IP}" Width="4*" MinWidth="60"/>
-                        <DataGridTextColumn Header="Port" IsReadOnly="True" Binding="{Binding Path=Port}" Width="3*" MinWidth="40"/>
+                        <DataGridTextColumn Header="PID" IsReadOnly="True" Binding="{Binding Path=PID}" Width="65" MinWidth="55" MaxWidth="95">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Status" IsReadOnly="True" Binding="{Binding Path=Status}" Width="80" MinWidth="80" MaxWidth="80">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Server Name" IsReadOnly="True" Binding="{Binding Path=Name}" Width="8*" MinWidth="110">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Host" IsReadOnly="True" Binding="{Binding Path=IP}" Width="5*" MinWidth="60">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Port" IsReadOnly="True" Binding="{Binding Path=Port}" Width="3*" MinWidth="40">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
                         <!--<DataGridTextColumn Header="Query Port" IsReadOnly="True" Binding="{Binding Path=QueryPort}" Width="4*" MinWidth="93"/>-->
-                        <DataGridTextColumn Header="Map" IsReadOnly="True" Binding="{Binding Path=Defaultmap}" Width="7*" MinWidth="80"/>
-                        <DataGridTextColumn Header="Players" IsReadOnly="True" Binding="{Binding Path=Maxplayers}" Width="3*" MinWidth="70"/>
-                        <DataGridTextColumn Header="UpTime" IsReadOnly="True" Binding="{Binding Path=UpTime}" Width="4*" MinWidth="93"/>
+                        <DataGridTextColumn Header="Map" IsReadOnly="True" Binding="{Binding Path=Defaultmap}" Width="7*" MinWidth="80">
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="Players" IsReadOnly="True" Binding="{Binding Path=Maxplayers}" Width="3*" MinWidth="70">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
+                        <DataGridTextColumn Header="UpTime" IsReadOnly="True" Binding="{Binding Path=Uptime}" Width="4*" MinWidth="80">
+                            <DataGridTextColumn.ElementStyle>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="TextAlignment" Value="Center" />
+                                </Style>
+                            </DataGridTextColumn.ElementStyle>
+                            <DataGridTextColumn.HeaderStyle>
+                                <Style TargetType="{x:Type DataGridColumnHeader}">
+                                    <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background}" />
+                                    <Setter Property="BorderBrush" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.BorderBrush}" />
+                                    <Setter Property="BorderThickness" Value="0 0 0 3" />
+                                    <Setter Property="Cursor" Value="Hand" />
+                                    <Setter Property="FontWeight" Value="SemiBold" />
+                                    <Setter Property="Foreground" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Foreground}" />
+                                    <Setter Property="HorizontalContentAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="0" />
+                                    <Setter Property="MinHeight" Value="25" />
+                                    <Setter Property="MinWidth" Value="0" />
+                                    <Setter Property="Padding" Value="{Binding Path=(mah:DataGridHelper.ColumnHeaderPadding), FallbackValue=0, TargetNullValue=0, Mode=OneWay, RelativeSource={RelativeSource AncestorType={x:Type DataGrid}}}" />
+                                    <Setter Property="SnapsToDevicePixels" Value="True" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="{x:Type DataGridColumnHeader}">
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <Border x:Name="BackgroundBorder" Grid.ColumnSpan="2" Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
+                                                    <mah:ContentControlEx x:Name="HeaderContent" Grid.Column="0" Margin="{TemplateBinding BorderThickness}" Padding="{TemplateBinding Padding}" HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}" VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}" Content="{TemplateBinding Content}" ContentCharacterCasing="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=(mah:ControlsHelper.ContentCharacterCasing)}" ContentStringFormat="{TemplateBinding ContentStringFormat}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" RecognizesAccessKey="{TemplateBinding mah:ControlsHelper.RecognizesAccessKey}" SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                                                    <Path x:Name="SortArrow" Grid.Column="1" Width="8" Height="10" Margin="0 0 8 2" VerticalAlignment="Center" Fill="{DynamicResource MahApps.Brushes.DataGridColumnHeader.SortArrowFill}" RenderTransformOrigin="0.5,0.5" Stretch="Fill" Visibility="Collapsed" />
+                                                    <Thumb x:Name="PART_LeftHeaderGripper" Grid.Column="0" HorizontalAlignment="Left" Background="Transparent" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                    <Thumb x:Name="PART_RightHeaderGripper" Grid.Column="1" HorizontalAlignment="Right" Style="{StaticResource MahApps.Styles.Thumb.ColumnHeaderGripper}" />
+                                                </Grid>
+                                                <ControlTemplate.Triggers>
+                                                    <Trigger Property="SortDirection" Value="Ascending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="SortDirection" Value="Descending">
+                                                        <Setter TargetName="SortArrow" Property="Data" Value="F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z " />
+                                                        <Setter TargetName="SortArrow" Property="Margin" Value="0 0 8 0" />
+                                                        <Setter TargetName="SortArrow" Property="Visibility" Value="Visible" />
+                                                    </Trigger>
+                                                    <Trigger Property="DisplayIndex" Value="0">
+                                                        <Setter TargetName="PART_LeftHeaderGripper" Property="Visibility" Value="Collapsed" />
+                                                    </Trigger>
+                                                </ControlTemplate.Triggers>
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                    <Setter Property="VerticalContentAlignment" Value="Center" />
+                                    <Setter Property="mah:ControlsHelper.ContentCharacterCasing" Value="{DynamicResource MahApps.CharacterCasing.DataGridColumnHeader}" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding Path=Column.IsReadOnly, RelativeSource={RelativeSource Self}, Mode=OneWay, FallbackValue=False, TargetNullValue=False}" Value="True">
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.ReadOnly}" />
+                                        </DataTrigger>
+                                        <MultiTrigger>
+                                            <MultiTrigger.Conditions>
+                                                <Condition Property="IsMouseOver" Value="True" />
+                                                <Condition Property="SortDirection" Value="{x:Null}" />
+                                            </MultiTrigger.Conditions>
+                                            <Setter Property="Background" Value="{DynamicResource MahApps.Brushes.DataGridColumnHeader.Background.MouseOver}" />
+                                        </MultiTrigger>
+                                        <Trigger Property="IsEnabled" Value="False">
+                                            <Setter Property="Foreground" Value="{DynamicResource {x:Static SystemColors.GrayTextBrushKey}}" />
+                                        </Trigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </DataGridTextColumn.HeaderStyle>
+                        </DataGridTextColumn>
                         <!--<DataGridTextColumn Header="RAM Usage" IsReadOnly="True" Binding="{Binding Path=RamUsage}" Width="4*"/>-->
                     </DataGrid.Columns>
                 </DataGrid>
@@ -814,6 +1354,10 @@
                     </Grid>
                 </DataTemplate>
             </Grid.Resources>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="47*"/>
+            </Grid.ColumnDefinitions>
             <mah:HamburgerMenu x:Name="HamburgerMenuControl"
                                     DisplayMode="CompactInline"
                                     IsPaneOpen="False"
@@ -826,7 +1370,7 @@
                                     HorizontalAlignment="Left"
                                     Visibility="Hidden"
                                     SelectedIndex="0"
-                                    Padding="0" OptionsItemClick="HamburgerMenu_OptionsItemClick">
+                                    Padding="0" OptionsItemClick="HamburgerMenu_OptionsItemClick" Grid.ColumnSpan="2">
 
                 <!--  Items  -->
                 <mah:HamburgerMenu.ItemsSource>

@@ -414,7 +414,9 @@
     <Compile Include="GameServer\INS.cs" />
     <Compile Include="GameServer\L4D2.cs" />
     <Compile Include="GameServer\MC.cs" />
-    <Compile Include="GameServer\MCBE.cs" />
+    <Compile Include="GameServer\MCBE.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="GameServer\MORDHAU.cs" />
     <Compile Include="GameServer\NMRIH.cs" />
     <Compile Include="GameServer\OLOW.cs" />

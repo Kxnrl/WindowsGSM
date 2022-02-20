@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using WindowsGSM.Functions;
 
@@ -38,7 +39,7 @@ namespace WindowsGSM.GameServer.Data
                 case BW.FullName: return new BW(serverData);
                 case ONSET.FullName: return new ONSET(serverData);
                 case EGS.FullName: return new EGS(serverData);
-                case UNT.FullName: return new UNT(serverData); 
+                case UNT.FullName: return new UNT(serverData);
                 case AVORION.FullName: return new AVORION(serverData);
                 case CE.FullName: return new CE(serverData);
                 case INSS.FullName: return new INSS(serverData);
@@ -55,19 +56,19 @@ namespace WindowsGSM.GameServer.Data
                 case ECO.FullName: return new ECO(serverData);
                 case VTS.FullName: return new VTS(serverData);
                 default: // Load Plugin
-                {
-                    if (pluginList == null) { return null; }
-
-                    foreach (var plugin in pluginList)
                     {
-                        if (plugin.IsLoaded && plugin.FullName == serverGame)
-                        {
-                            return PluginManagement.GetPluginClass(plugin, serverData);
-                        }
-                    }
+                        if (pluginList == null) { return null; }
 
-                    return null;
-                };
+                        foreach (var plugin in pluginList)
+                        {
+                            if (plugin.IsLoaded && plugin.FullName == serverGame)
+                            {
+                                return PluginManagement.GetPluginClass(plugin, serverData);
+                            }
+                        }
+
+                        return null;
+                    };
             }
         }
 

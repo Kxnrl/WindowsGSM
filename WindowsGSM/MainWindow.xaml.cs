@@ -1,33 +1,33 @@
-﻿using System;
+﻿using ControlzEx.Theming;
+using LiveCharts;
+using LiveCharts.Wpf;
+using MahApps.Metro.Controls;
+using MahApps.Metro.Controls.Dialogs;
+using Microsoft.Win32;
+using NCrontab;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.IO.Compression;
 using System.Linq;
+using System.Management;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.IO;
-using System.Net;
-using System.IO.Compression;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Windows.Forms;
-using Microsoft.Win32;
-using MahApps.Metro.Controls;
-using MahApps.Metro.Controls.Dialogs;
-using Newtonsoft.Json.Linq;
-using NCrontab;
-using System.Collections.Generic;
-using System.Collections;
-using LiveCharts;
-using LiveCharts.Wpf;
-using System.Management;
 using System.Windows.Media.Imaging;
-using ControlzEx.Theming;
 using WindowsGSM.Functions;
 using Label = System.Windows.Controls.Label;
-using Orientation = System.Windows.Controls.Orientation;
-using System.Windows.Documents;
 using MessageBox = System.Windows.MessageBox;
+using Orientation = System.Windows.Controls.Orientation;
 
 namespace WindowsGSM
 {
@@ -572,7 +572,7 @@ namespace WindowsGSM
             Process.Start(e.Uri.AbsoluteUri);
         }
 
-        private async void ImportPlugin_Click(object sender, RoutedEventArgs e) 
+        private async void ImportPlugin_Click(object sender, RoutedEventArgs e)
         {
             // If a server is installing or import => return
             if (progressbar_InstallProgress.IsIndeterminate || progressbar_ImportProgress.IsIndeterminate)
@@ -654,13 +654,13 @@ namespace WindowsGSM
         {
             string[] livePlayerData = new string[MAX_SERVER + 1];
             var liveMapData = new string[MAX_SERVER + 1];
-            var liveUptimeData = new string[MAX_SERVER + 1]; 
+            var liveUptimeData = new string[MAX_SERVER + 1];
             foreach (ServerTable item in ServerGrid.Items)
             {
                 var id = int.Parse(item.ID);
                 livePlayerData[id] = item.Maxplayers;
                 liveMapData[id] = item.Defaultmap;
-                liveUptimeData[id] = item.UpTime;
+                liveUptimeData[id] = item.Uptime;
             }
 
             var selectedrow = (ServerTable)ServerGrid.SelectedItem;
@@ -740,8 +740,8 @@ namespace WindowsGSM
                         IP = serverConfig.ServerIP,
                         Port = serverConfig.ServerPort,
                         QueryPort = serverConfig.ServerQueryPort,
-                        Defaultmap = (g_iServerStatus[i] != ServerStatus.Started) ? serverConfig.ServerMap : liveMapData[i],
-                        Maxplayers = (GetServerMetadata(i).ServerStatus != ServerStatus.Started) ? serverConfig.ServerMaxPlayer : livePlayerData[i]
+                        Defaultmap = (GetServerMetadata(i).ServerStatus != ServerStatus.Started) ? serverConfig.ServerMap : liveMapData[i],
+                        Maxplayers = (GetServerMetadata(i).ServerStatus != ServerStatus.Started) ? serverConfig.ServerMaxPlayer : livePlayerData[i],
                         //Maxplayers = (g_iServerStatus[i] != ServerStatus.Started) ? serverConfig.ServerMaxPlayer : livePlayerData[i],
                         //UpTime = (g_iServerStatus[i] != ServerStatus.Started) ? "N/A" : liveUptimeData[i]
                     };
@@ -928,7 +928,7 @@ namespace WindowsGSM
 
         public int GetActivePlayers()
         {
-            return ServerGrid.Items.Cast<ServerTable>().Where(s => s.Maxplayers != null && s.Maxplayers.Contains('/')).Sum(s => int.TryParse(s.Maxplayers.Split('/')[0], out int count) ? count : 0 );
+            return ServerGrid.Items.Cast<ServerTable>().Where(s => s.Maxplayers != null && s.Maxplayers.Contains('/')).Sum(s => int.TryParse(s.Maxplayers.Split('/')[0], out int count) ? count : 0);
         }
 
         private void Refresh_DashBoard_LiveChart()
@@ -1916,14 +1916,10 @@ namespace WindowsGSM
                 Log(server.ID, $"[NOTICE] Fail to set affinity. ({e.Message})");
             }
 
-            server.StartedTime = DateTime.Now;
-
             // Save Cache
             ServerCache.SavePID(server.ID, p.Id);
             ServerCache.SaveProcessName(server.ID, p.ProcessName);
             ServerCache.SaveWindowsIntPtr(server.ID, GetServerMetadata(server.ID).MainWindow);
-
-            server.StartedTime = DateTime.Now;
 
             SetWindowText(p.MainWindowHandle, server.Name);
 
@@ -2651,7 +2647,7 @@ namespace WindowsGSM
             }
         }
 
-        private async void StartExceptionDetecter(Functions.ServerTable server)
+        private async void StartExceptionDetecter(ServerTable server)
         {
             // Check is source engine game?
             var type = GameServer.Data.Class.GetType(server.Game);
@@ -2665,24 +2661,20 @@ namespace WindowsGSM
 
             //Log(server.ID, "StartExceptionDetector");
 
+            var metadata = GetServerMetadata(server.ID);
+
             // Save the process of game server
-            var p = g_Process[int.Parse(server.ID)];
+            var p = metadata.Process;
 
             // Check server status every 1 seconds
             while (p != null && !p.HasExited)
             {
                 await Task.Delay(1000);
 
-                server.UpTime = "N/A";
-
-                if (g_iServerStatus[int.Parse(server.ID)] == ServerStatus.Stopped)
+                if (metadata.ServerStatus == ServerStatus.Stopped)
                 {
                     break;
                 }
-
-                server.UpTime = ((DateTime.Now - server.StartedTime).TotalSeconds < 0) ? 
-                    DateTime.Now + " => " + server.StartedTime : 
-                    (DateTime.Now - server.StartedTime).ToString("d':'hh':'mm':'ss");
 
                 var err = "Engine Error";
                 var ret = string.Empty;
@@ -2706,7 +2698,7 @@ namespace WindowsGSM
             }
         }
 
-        private async void StartQuery(Functions.ServerTable server)
+        private async void StartQuery(ServerTable server)
         {
             if (string.IsNullOrWhiteSpace(server.IP) || string.IsNullOrWhiteSpace(server.QueryPort)) { return; }
 
@@ -2758,15 +2750,18 @@ namespace WindowsGSM
 
                     if (changed)
                     {
-                        if (server.ID == ((ServerTable)ServerGrid.Items[i]).ID)
+                        for (int i = 0; i < ServerGrid.Items.Count; i++)
                         {
-                            server.Defaultmap = info.Map as string;
+                            if (server.ID == ((ServerTable)ServerGrid.Items[i]).ID)
+                            {
+                                server.Defaultmap = info.Map as string;
 
-                            int selectedIndex = ServerGrid.SelectedIndex;
-                            ServerGrid.Items[i] = server;
-                            ServerGrid.SelectedIndex = selectedIndex;
-                            ServerGrid.Items.Refresh();
-                            break;
+                                int selectedIndex = ServerGrid.SelectedIndex;
+                                ServerGrid.Items[i] = server;
+                                ServerGrid.SelectedIndex = selectedIndex;
+                                ServerGrid.Items.Refresh();
+                                break;
+                            }
                         }
                     }
                 }
