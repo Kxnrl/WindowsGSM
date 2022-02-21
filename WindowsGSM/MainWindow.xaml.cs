@@ -826,7 +826,7 @@ namespace WindowsGSM
         {
             while (true)
             {
-                await Task.Delay(60 * 1000);
+                await Task.Delay(TimeSpan.FromMinutes(1));
                 ServerGrid.Items.Refresh();
             }
         }
@@ -1105,7 +1105,7 @@ namespace WindowsGSM
                 button_discordtest.IsEnabled = switch_discordalert.IsOn;
 
                 textBox_restartcrontab.Text = GetServerMetadata(row.ID).CrontabFormat;
-                textBox_nextcrontab.Text = CrontabSchedule.TryParse(textBox_restartcrontab.Text)?.GetNextOccurrence(DateTime.Now).ToString("ddd, MM/dd/yyyy HH:mm:ss");
+                textBox_nextcrontab.Text = CrontabSchedule.TryParse(textBox_restartcrontab.Text)?.GetNextOccurrence(DateTime.Now).ToString("ddd, yyyy/MM/dd HH:mm:ss");
 
                 MahAppSwitch_AutoStartAlert.IsOn = GetServerMetadata(row.ID).AutoStartAlert;
                 MahAppSwitch_AutoRestartAlert.IsOn = GetServerMetadata(row.ID).AutoRestartAlert;
@@ -1622,7 +1622,7 @@ namespace WindowsGSM
                 if (GetServerMetadata(server.ID).ServerStatus == ServerStatus.Stopped)
                 {
                     await GameServer_Start(server);
-                    await Task.Delay(TimeSpan.FromSeconds(10));
+                    await Task.Delay(TimeSpan.FromSeconds(3));
                 }
             }
         }
@@ -1951,10 +1951,10 @@ namespace WindowsGSM
             dynamic gameServer = GameServer.Data.Class.Get(server.Game, pluginList: PluginsList);
             await gameServer.Stop(p);
 
-            for (int i = 0; i < 10; i++)
+            for (var i = 0; i < 100; i++)
             {
                 if (p == null || p.HasExited) { break; }
-                await Task.Delay(1000);
+                await Task.Delay(100);
             }
 
             _serverMetadata[int.Parse(server.ID)].ServerConsole.Clear();
@@ -2033,7 +2033,7 @@ namespace WindowsGSM
                 return;
             }
 
-            Process p = GetServerMetadata(server.ID).Process;
+            var p = GetServerMetadata(server.ID).Process;
             if (p != null) { return; }
 
             if (GetServerMetadata(server.ID).BackupOnStart)
@@ -2451,28 +2451,32 @@ namespace WindowsGSM
             });
         }
 
-        const int UPDATE_INTERVAL_MINUTE = 30;
-        private async void StartAutoUpdateCheck(ServerTable server)
+        const int UPDATE_INTERVAL_MINUTE = 5;
+        private async Task StartAutoUpdateCheck(ServerTable server)
         {
             int serverId = int.Parse(server.ID);
 
             //Save the process of game server
             Process p = GetServerMetadata(server.ID).Process;
 
+            if (p == null || p.HasExited)
+                return;
+
             dynamic gameServer = GameServer.Data.Class.Get(server.Game, new ServerConfig(server.ID), PluginsList);
 
             string localVersion = gameServer.GetLocalBuild();
 
-            while (p != null && !p.HasExited)
-            {
-                await Task.Delay(60000 * UPDATE_INTERVAL_MINUTE);
+            await Task.Delay(TimeSpan.FromMinutes(UPDATE_INTERVAL_MINUTE));
 
+            while (!p.HasExited)
+            {
                 if (!GetServerMetadata(server.ID).AutoUpdate || GetServerMetadata(server.ID).ServerStatus == ServerStatus.Updating)
                 {
+                    await Task.Delay(TimeSpan.FromMinutes(UPDATE_INTERVAL_MINUTE));
                     continue;
                 }
 
-                if (p == null || p.HasExited) { break; }
+                if (p.HasExited) { break; }
 
                 //Try to get local build again if not found just now
                 if (string.IsNullOrWhiteSpace(localVersion))
@@ -2552,6 +2556,8 @@ namespace WindowsGSM
                 {
                     Log(server.ID, $"[NOTICE] Fail to get remote build.");
                 }
+
+                await Task.Delay(TimeSpan.FromMinutes(UPDATE_INTERVAL_MINUTE));
             }
         }
 
@@ -2588,7 +2594,7 @@ namespace WindowsGSM
                     var currentRow = (ServerTable)ServerGrid.SelectedItem;
                     if (currentRow.ID == server.ID)
                     {
-                        textBox_nextcrontab.Text = CrontabSchedule.TryParse(GetServerMetadata(serverId).CrontabFormat)?.GetNextOccurrence(DateTime.Now).ToString("ddd, MM/dd/yyyy HH:mm:ss");
+                        textBox_nextcrontab.Text = CrontabSchedule.TryParse(GetServerMetadata(serverId).CrontabFormat)?.GetNextOccurrence(DateTime.Now).ToString("ddd, yyyy/MM/dd HH:mm:ss");
                     }
 
                     if (p == null || p.HasExited)
@@ -2643,7 +2649,7 @@ namespace WindowsGSM
                     analytics.SendGameServerHeartBeat(server.Game, server.Name);
                 }
 
-                await Task.Delay(300000);
+                await Task.Delay(TimeSpan.FromMinutes(5));
             }
         }
 
@@ -2669,7 +2675,7 @@ namespace WindowsGSM
             // Check server status every 1 seconds
             while (p != null && !p.HasExited)
             {
-                await Task.Delay(1000);
+                await Task.Delay(TimeSpan.FromSeconds(1));
 
                 if (metadata.ServerStatus == ServerStatus.Stopped)
                 {
@@ -2710,9 +2716,11 @@ namespace WindowsGSM
             // Save the process of game server
             Process p = GetServerMetadata(server.ID).Process;
 
-            // Query server every 5 seconds
+            // Query server every 3 seconds
             while (p != null && !p.HasExited)
             {
+                await Task.Delay(TimeSpan.FromSeconds(3));
+
                 if (GetServerMetadata(server.ID).ServerStatus == ServerStatus.Stopped)
                 {
                     break;
@@ -2765,8 +2773,6 @@ namespace WindowsGSM
                         }
                     }
                 }
-
-                await Task.Delay(5000);
             }
         }
 
@@ -2795,10 +2801,12 @@ namespace WindowsGSM
                     try
                     {
                         process.Kill();
+                        Log(serverId, $"Force kill old process: PID={process.Id}");
                     }
-                    catch
+                    catch (Exception ex)
                     {
                         //ignore
+                        Debug.Print($"Failed to kill process {process.Id} -> {ex.Message}");
                     }
                 }
             });
@@ -2839,8 +2847,8 @@ namespace WindowsGSM
 
         public void Log(string serverId, string logText, bool append = true)
         {
-            string title = int.TryParse(serverId, out int i) ? $"#{i.ToString()}" : serverId;
-            string log = $"[{DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss")}][{title}] {logText}" + Environment.NewLine;
+            string title = int.TryParse(serverId, out var i) ? $"#{i}" : serverId;
+            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss")}][{title}] {logText}" + Environment.NewLine;
             string logPath = ServerPath.GetLogs();
             Directory.CreateDirectory(logPath);
 
@@ -2857,7 +2865,7 @@ namespace WindowsGSM
 
         public void DiscordBotLog(string logText)
         {
-            string log = $"[{DateTime.Now.ToString("MM/dd/yyyy-HH:mm:ss")}] {logText}" + Environment.NewLine;
+            string log = $"[{DateTime.Now.ToString("yyyy/MM/dd-HH:mm:ss")}] {logText}" + Environment.NewLine;
             string logPath = ServerPath.GetLogs();
             Directory.CreateDirectory(logPath);
 
@@ -2871,7 +2879,7 @@ namespace WindowsGSM
 
         private string RemovedOldLog(string logText)
         {
-            const int MAX_LOG_LINE = 50;
+            const int MAX_LOG_LINE = 200;
             int lineCount = logText.Count(f => f == '\n');
             return (lineCount > MAX_LOG_LINE) ? string.Join("\n", logText.Split('\n').Skip(lineCount - MAX_LOG_LINE).ToArray()) : logText;
         }
@@ -3692,7 +3700,7 @@ namespace WindowsGSM
             ServerConfig.SetSetting(server.ID, ServerConfig.SettingName.CrontabFormat, crontabFormat);
 
             textBox_restartcrontab.Text = crontabFormat;
-            textBox_nextcrontab.Text = CrontabSchedule.TryParse(crontabFormat)?.GetNextOccurrence(DateTime.Now).ToString("ddd, MM/dd/yyyy HH:mm:ss") ?? string.Empty;
+            textBox_nextcrontab.Text = CrontabSchedule.TryParse(crontabFormat)?.GetNextOccurrence(DateTime.Now).ToString("ddd, yyyy/MM/dd HH:mm:ss") ?? string.Empty;
         }
         #endregion
 
