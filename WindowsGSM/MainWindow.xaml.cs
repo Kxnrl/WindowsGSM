@@ -1586,7 +1586,7 @@ namespace WindowsGSM
                     Process p = GetServerMetadata(server.ID).Process;
                     if (p != null && !p.HasExited)
                     {
-                        Log(server.ID, "Actions: Kill");
+                        Log(server.ID, "Action: Kill");
                         p.Kill();
 
                         _serverMetadata[int.Parse(server.ID)].ServerStatus = ServerStatus.Stopped;
